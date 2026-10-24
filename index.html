@@ -71,6 +71,9 @@ const NTAS = "https://ntas.ttc.ca/api/ntas/get-next-train-time/";
 // The TTC alerts feed blocks browser requests, so a scheduled job saves it to alerts.json.
 const ALERTS = "alerts.json";
 const REFRESH_MS = 20000;
+// Scheduled Laird to Eglinton time (TTC schedule data, same for every trip) and a guess at the walk from the Line 5 platform to Line 1.
+const L5_RIDE_MIN = 6;
+const TRANSFER_MIN = 4;
 // Line 1 stations in order, Finch to Vaughan, so alerts can be matched to the Eglinton to St Andrew trip.
 const LINE1 = ["Finch", "North York Centre", "Sheppard-Yonge", "York Mills", "Lawrence", "Eglinton", "Davisville", "St Clair",
   "Summerhill", "Rosedale", "Bloor-Yonge", "Wellesley", "College", "TMU", "Queen", "King", "Union", "St Andrew", "Osgoode",
@@ -156,7 +159,7 @@ function render() {
       const leave = catchable - need;
       hero.innerHTML = `<div class="label">Leave in</div>
         <div class="big ${leave <= 2 ? "hurry" : "go"}">${leave <= 0 ? "Now" : leave + " min"}</div>
-        <div class="sub">to catch the ${catchable}-min train to ${STOPS[dir].name}</div>`;
+        <div class="sub">to catch the ${catchable}-min train to ${STOPS[dir].name}</div>${connection(catchable)}`;
     }
     list.hidden = !trains.length;
     list.innerHTML = trains.map((t) => {
@@ -211,6 +214,20 @@ function lineFiveWarnings() {
 }
 
 // True unless the alert is northbound-only or names a stretch that doesn't overlap Eglinton to St Andrew.
+// For the westbound train you'd catch: when it reaches Eglinton and which southbound Line 1 train you'd make.
+function connection(catchable) {
+  if (dir !== "w") return "";
+  const arrive = catchable + L5_RIDE_MIN;
+  const f = fetched.s;
+  let line1 = "";
+  if (f) {
+    const el = (Date.now() - f.at) / 60000;
+    const next = f.minutes.map((m) => Math.max(0, Math.round(m - el))).find((t) => t >= arrive + TRANSFER_MIN);
+    if (next !== undefined) line1 = ` Next Line 1 southbound you'd make is in ${next} min (about ${next - arrive - TRANSFER_MIN} min wait at the platform).`;
+  }
+  return `<div class="sub" style="margin-top:8px">Reach Eglinton in about ${arrive} min (scheduled ride ${L5_RIDE_MIN} min).${line1}</div>`;
+}
+
 function onMyTrip(a) {
   if (a.route !== "1") return false;
   if (/northbound/i.test(a.text) && !/southbound/i.test(a.text)) return false;

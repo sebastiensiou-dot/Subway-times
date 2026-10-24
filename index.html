@@ -49,30 +49,38 @@
 </head>
 <body>
 <main>
-  <h1><span class="badge">5</span> Laird station</h1>
-  <div class="tabs" role="group" aria-label="Direction">
-    <button id="tab-w" aria-pressed="true">West → Mount Dennis</button>
-    <button id="tab-e" aria-pressed="false">East → Kennedy</button>
+  <h1 id="title"><span class="badge">5</span> Laird to St Andrew</h1>
+  <div class="tabs" role="group" aria-label="Trip">
+    <button id="tab-work" aria-pressed="true">To St Andrew</button>
+    <button id="tab-home" aria-pressed="false">Home</button>
   </div>
   <div id="alerts"></div>
   <div id="hero" class="hero"><div class="label">Loading…</div></div>
   <div id="list" class="list" hidden></div>
-  <h2><span class="badge">1</span> Eglinton station</h2>
-  <div id="l1" class="list l1"><div class="row">Loading…</div></div>
+  <h2 id="side-title"></h2>
+  <div id="side" class="list l1"><div class="row">Loading…</div></div>
   <footer>
     <label>Walk <input id="walk" type="number" min="0" max="60" inputmode="numeric"> + buffer <input id="buffer" type="number" min="0" max="30" inputmode="numeric"> min</label>
     <span id="status"></span>
   </footer>
 </main>
 <script>
-const STOPS = { w: { id: "16076", name: "Mount Dennis" }, e: { id: "16075", name: "Kennedy" } };
-const L1 = { s: { id: "13795", name: "Southbound to Union" }, n: { id: "13796", name: "Northbound to Finch" } };
+// Platform stop codes from the TTC's GTFS stops list. Keys are used throughout.
+const STOPS = {
+  laird: "16076",       // Line 5 westbound at Laird (to Mount Dennis)
+  lairdE: "16075",      // Line 5 eastbound at Laird, only used for the delay check
+  eglE: "16073",        // Line 5 eastbound at Eglinton (to Kennedy)
+  egl1S: "13795",       // Line 1 southbound at Eglinton (to Union)
+  stAndrew: "13818",    // Line 1 at St Andrew, the platform for trains heading to Union and on to Finch
+};
 const NTAS = "https://ntas.ttc.ca/api/ntas/get-next-train-time/";
 // The TTC alerts feed blocks browser requests, so a scheduled job saves it to alerts.json.
 const ALERTS = "alerts.json";
 const REFRESH_MS = 20000;
-// Scheduled Laird to Eglinton time (TTC schedule data, same for every trip) and a guess at the walk from the Line 5 platform to Line 1.
-const L5_RIDE_MIN = 6;
+// Scheduled ride times from the TTC's GTFS schedule (median), and a guess at the walk between the Line 5 and Line 1 platforms.
+const L5_RIDE_MIN = 6;         // Laird <-> Eglinton
+const L1_SB_RIDE_MIN = 17;     // Eglinton to St Andrew
+const L1_NB_RIDE_MIN = 18;     // St Andrew to Eglinton
 const TRANSFER_MIN = 4;
 // Line 1 stations in order, Finch to Vaughan, so alerts can be matched to the Eglinton to St Andrew trip.
 const LINE1 = ["Finch", "North York Centre", "Sheppard-Yonge", "York Mills", "Lawrence", "Eglinton", "Davisville", "St Clair",
@@ -90,23 +98,24 @@ const store = {
   set(k, v) { try { localStorage.setItem(k, v); } catch {} },
 };
 
-let dir = store.get("dir", "w");
+// Heading out in the morning, heading home after noon; the buttons override.
+let mode = new Date().getHours() < 12 ? "work" : "home";
 // Home to Laird is ~350 m (about 5 min on foot); the buffer covers the stairs and platform.
 let walk = Number(store.get("walk2", 5));
 let buffer = Number(store.get("buffer", 2));
-let fetched = {};   // dir -> { minutes: [..], at: ms }
+let fetched = {};   // stop key -> { minutes: [..], at: ms }
 let alerts = [];
 let alertsOk = false;
 let alertsChecked = 0;
 let lastError = null;
 
-async function loadTrains(d) {
-  const res = await fetch(NTAS + (STOPS[d] || L1[d]).id, { cache: "no-store" });
+async function loadTrains(key) {
+  const res = await fetch(NTAS + STOPS[key], { cache: "no-store" });
   if (!res.ok) throw new Error("TTC returned " + res.status);
   const data = await res.json();
   const text = (data[0] && data[0].nextTrains) || "";
   const minutes = text.split(",").map((s) => parseInt(s, 10)).filter((n) => !isNaN(n));
-  fetched[d] = { minutes, at: Date.now() };
+  fetched[key] = { minutes, at: Date.now() };
 }
 
 async function loadAlerts() {
@@ -125,7 +134,7 @@ async function loadAlerts() {
 
 async function refresh() {
   try {
-    await Promise.all([loadTrains("w"), loadTrains("e"), loadTrains("s"), loadTrains("n"), loadAlerts().catch(() => {})]);
+    await Promise.all([...Object.keys(STOPS).map(loadTrains), loadAlerts().catch(() => {})]);
     lastError = null;
   } catch (e) {
     lastError = e;
@@ -133,22 +142,43 @@ async function refresh() {
   render();
 }
 
+// Minutes until each listed train, corrected for the time since the data was fetched.
+function live(key) {
+  const f = fetched[key];
+  if (!f) return null;
+  const elapsed = (Date.now() - f.at) / 60000;
+  return f.minutes.map((m) => Math.max(0, Math.round(m - elapsed)));
+}
+
+const clock = (minFromNow) => new Date(Date.now() + minFromNow * 60000).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+const mins = (n) => (n === 0 ? "Now" : n + " min");
+
 function render() {
-  $("tab-w").setAttribute("aria-pressed", dir === "w");
-  $("tab-e").setAttribute("aria-pressed", dir === "e");
+  $("tab-work").setAttribute("aria-pressed", mode === "work");
+  $("tab-home").setAttribute("aria-pressed", mode === "home");
   $("walk").value = walk;
   $("buffer").value = buffer;
-  const need = walk + buffer;
+  if (mode === "work") renderWork(); else renderHome();
+  renderAlerts();
+  const f = fetched.laird;
+  $("status").textContent = f ? "Updated " + new Date(f.at).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" }) : "";
+}
 
+function unavailable() {
+  return lastError
+    ? '<div class="label err">Can\'t reach TTC data right now.<br>Check the board at the station or ttc.ca.</div>'
+    : '<div class="label">Loading…</div>';
+}
+
+function renderWork() {
+  $("title").innerHTML = '<span class="badge">5</span> Laird to St Andrew';
+  const need = walk + buffer;
   const hero = $("hero"), list = $("list");
-  const f = fetched[dir];
-  if (!f) {
-    hero.innerHTML = lastError
-      ? '<div class="label err">Can\'t reach TTC data right now.<br>Check the board at the station or ttc.ca.</div>'
-      : '<div class="label">Loading…</div>';
+  const trains = live("laird");
+  if (!trains) {
+    hero.innerHTML = unavailable();
+    list.hidden = true;
   } else {
-    const elapsed = (Date.now() - f.at) / 60000;
-    const trains = f.minutes.map((m) => Math.max(0, Math.round(m - elapsed)));
     const catchable = trains.find((t) => t >= need);
     if (!trains.length) {
       hero.innerHTML = '<div class="label">No trains listed right now</div>';
@@ -159,16 +189,69 @@ function render() {
       const leave = catchable - need;
       hero.innerHTML = `<div class="label">Leave in</div>
         <div class="big ${leave <= 2 ? "hurry" : "go"}">${leave <= 0 ? "Now" : leave + " min"}</div>
-        <div class="sub">to catch the ${catchable}-min train to ${STOPS[dir].name}</div>${connection(catchable)}`;
+        <div class="sub">to catch the ${catchable}-min train to Mount Dennis</div>${tripWork(catchable, leave)}`;
     }
     list.hidden = !trains.length;
     list.innerHTML = trains.map((t) => {
       const ok = t >= need;
-      return `<div class="row"><span>${t === 0 ? "Arriving" : t + " min"}</span>` +
-        `<span class="tag ${ok ? "ok" : "miss"}">${ok ? "leave in " + (t - need) + " min" : "too soon"}</span></div>`;
+      return `<div class="row"><span>${mins(t)}</span><span class="tag ${ok ? "ok" : "miss"}">${ok ? "leave in " + (t - need) + " min" : "too soon"}</span></div>`;
     }).join("");
   }
+  $("side-title").innerHTML = '<span class="badge">1</span> Eglinton southbound';
+  const sb = live("egl1S");
+  $("side").innerHTML = `<div class="row"><span class="dest">To Union and St Andrew</span><span class="times">${
+    sb ? (sb.length ? sb.map((n) => (n === 0 ? "Now" : n)).join(", ") + " min" : "–") : "…"}</span></div>`;
+}
 
+// Door-to-platform estimate for the train you'd catch: Line 5 to Eglinton, transfer, next Line 1 southbound, ride to St Andrew.
+function tripWork(catchable, leave) {
+  const atEgl = catchable + L5_RIDE_MIN;
+  let out = `<div class="sub" style="margin-top:8px">Reach Eglinton in about ${atEgl} min.`;
+  const sb = live("egl1S");
+  const next = sb && sb.find((t) => t >= atEgl + TRANSFER_MIN);
+  if (next !== undefined && next !== null) {
+    const arrive = next + L1_SB_RIDE_MIN;
+    out += ` Next Line 1 southbound you'd make is in ${next} min.</div>` +
+      `<div class="sub" style="margin-top:8px"><b>St Andrew about ${clock(arrive)}</b> (${arrive - leave} min after you leave the house)`;
+  }
+  return out + "</div>";
+}
+
+function renderHome() {
+  $("title").innerHTML = '<span class="badge">1</span> St Andrew to Laird';
+  const hero = $("hero"), list = $("list");
+  const trains = live("stAndrew");
+  const east = live("eglE");
+  if (!trains) {
+    hero.innerHTML = unavailable();
+    list.hidden = true;
+  } else if (!trains.length) {
+    hero.innerHTML = '<div class="label">No trains listed right now</div>';
+    list.hidden = true;
+  } else {
+    // For each train from St Andrew: reach Eglinton, walk to Line 5, take the first eastbound you can make, ride to Laird, walk home.
+    const eta = (t) => {
+      const atEgl = t + L1_NB_RIDE_MIN + TRANSFER_MIN;
+      const e = east && east.find((x) => x >= atEgl);
+      return e === undefined || e === null ? null : e + L5_RIDE_MIN + walk;
+    };
+    const first = eta(trains[0]);
+    hero.innerHTML = `<div class="label">Next train at St Andrew</div>
+      <div class="big go">${mins(trains[0])}</div>
+      <div class="sub">to Union, then north to Eglinton</div>` +
+      (first === null ? "" : `<div class="sub" style="margin-top:8px"><b>Home about ${clock(first)}</b> (${first} min from now)</div>`);
+    list.hidden = false;
+    list.innerHTML = trains.map((t) => {
+      const h = eta(t);
+      return `<div class="row"><span>${mins(t)}</span><span class="tag ok">${h === null ? "" : "home about " + clock(h)}</span></div>`;
+    }).join("");
+  }
+  $("side-title").innerHTML = '<span class="badge">5</span> Eglinton eastbound';
+  $("side").innerHTML = `<div class="row"><span class="dest">To Laird and Kennedy</span><span class="times">${
+    east ? (east.length ? east.map((n) => (n === 0 ? "Now" : n)).join(", ") + " min" : "–") : "…"}</span></div>`;
+}
+
+function renderAlerts() {
   const l5 = lineFiveWarnings();
   const alertHtml = (a) => `<div class="alert"><span class="ln">Line ${esc(a.route)}</span>${esc(a.text.replace(/^Line \d[^:]*:\s*/, ""))}` +
     `<span class="src">${a.updated ? "Updated " + ago(a.updated) : ""}${a.start && a.start > "2000" ? " · in effect since " + shortDate(a.start) : ""}</span></div>`;
@@ -183,23 +266,13 @@ function render() {
     $("alerts").innerHTML = l5 + (mine.length ? mine.map(alertHtml).join("") : '<div class="alert none">Nothing on your Eglinton to St Andrew trip.</div>') +
       (other.length ? `<details><summary class="more">${other.length} alert${other.length > 1 ? "s" : ""} not on your trip</summary>${other.map(alertHtml).join("")}</details>` : "");
   }
-
-  $("l1").innerHTML = ["s", "n"].map((d) => {
-    const x = fetched[d];
-    const el = x ? (Date.now() - x.at) / 60000 : 0;
-    const t = x ? x.minutes.map((m) => Math.max(0, Math.round(m - el))) : [];
-    return `<div class="row"><span class="dest">${L1[d].name}</span><span class="times">${
-      x ? (t.length ? t.map((n) => (n === 0 ? "Now" : n)).join(", ") + " min" : "–") : "…"}</span></div>`;
-  }).join("");
-  $("status").textContent = f ? "Updated " + new Date(f.at).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" }) : "";
 }
 
 function lineFiveWarnings() {
   const out = [];
-  for (const d of ["w", "e"]) {
-    const f = fetched[d];
+  for (const [key, label] of [["laird", "Westbound"], ["lairdE", "Eastbound"]]) {
+    const f = fetched[key];
     if (!f) continue;
-    const label = d === "w" ? "Westbound" : "Eastbound";
     const m = f.minutes;
     if (!m.length) {
       out.push(`${label}: no trains listed. Service may have ended or be disrupted.`);
@@ -213,24 +286,11 @@ function lineFiveWarnings() {
   return out.map((t) => `<div class="alert"><span class="ln">Line 5</span>${esc(t)} <span class="src">From live train times, not an official TTC notice.</span></div>`).join("");
 }
 
-// True unless the alert is northbound-only or names a stretch that doesn't overlap Eglinton to St Andrew.
-// For the westbound train you'd catch: when it reaches Eglinton and which southbound Line 1 train you'd make.
-function connection(catchable) {
-  if (dir !== "w") return "";
-  const arrive = catchable + L5_RIDE_MIN;
-  const f = fetched.s;
-  let line1 = "";
-  if (f) {
-    const el = (Date.now() - f.at) / 60000;
-    const next = f.minutes.map((m) => Math.max(0, Math.round(m - el))).find((t) => t >= arrive + TRANSFER_MIN);
-    if (next !== undefined) line1 = ` Next Line 1 southbound you'd make is in ${next} min (about ${next - arrive - TRANSFER_MIN} min wait at the platform).`;
-  }
-  return `<div class="sub" style="margin-top:8px">Reach Eglinton in about ${arrive} min (scheduled ride ${L5_RIDE_MIN} min).${line1}</div>`;
-}
-
+// On the trip unless the alert is on a Line 1 stretch that doesn't overlap Eglinton to St Andrew. Heading to St Andrew,
+// northbound-only notices don't apply; heading home the trip runs both ways, so direction is ignored.
 function onMyTrip(a) {
   if (a.route !== "1") return false;
-  if (/northbound/i.test(a.text) && !/southbound/i.test(a.text)) return false;
+  if (mode === "work" && /northbound/i.test(a.text) && !/southbound/i.test(a.text)) return false;
   const m = a.text.match(/(?:from|between) (.+?) (?:to|and) (.+?) stations?/i);
   if (!m) return true;
   const idx = [m[1], m[2]].map((n) => LINE1.findIndex((x) => x.toLowerCase() === n.trim().toLowerCase()));
@@ -253,8 +313,8 @@ function shortDate(iso) {
 
 function esc(s) { return String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])); }
 
-$("tab-w").onclick = () => { dir = "w"; store.set("dir", dir); render(); };
-$("tab-e").onclick = () => { dir = "e"; store.set("dir", dir); render(); };
+$("tab-work").onclick = () => { mode = "work"; render(); };
+$("tab-home").onclick = () => { mode = "home"; render(); };
 $("walk").oninput = (e) => {
   const n = Number(e.target.value);
   if (!isNaN(n) && n >= 0) { walk = n; store.set("walk2", n); render(); }

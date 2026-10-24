@@ -1,0 +1,32 @@
+name: Log Line 5 times
+
+on:
+  schedule:
+    - cron: "*/5 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: log-line5
+
+jobs:
+  log:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          ref: data
+          path: data
+      - run: python3 scripts/log_line5.py data/line5
+      - name: Commit log
+        working-directory: data
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@users.noreply.github.com"
+          git add -A
+          git commit -m "Log Line 5 times" || exit 0
+          git pull --rebase origin data
+          git push origin HEAD:data

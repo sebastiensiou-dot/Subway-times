@@ -71,6 +71,13 @@ const NTAS = "https://ntas.ttc.ca/api/ntas/get-next-train-time/";
 // The TTC alerts feed blocks browser requests, so a scheduled job saves it to alerts.json.
 const ALERTS = "alerts.json";
 const REFRESH_MS = 20000;
+// Line 1 stations in order, Finch to Vaughan, so alerts can be matched to the Eglinton to St Andrew trip.
+const LINE1 = ["Finch", "North York Centre", "Sheppard-Yonge", "York Mills", "Lawrence", "Eglinton", "Davisville", "St Clair",
+  "Summerhill", "Rosedale", "Bloor-Yonge", "Wellesley", "College", "TMU", "Queen", "King", "Union", "St Andrew", "Osgoode",
+  "St Patrick", "Queen's Park", "Museum", "St George", "Spadina", "Dupont", "St Clair West", "Cedarvale", "Eglinton West", "Glencairn",
+  "Lawrence West", "Yorkdale", "Wilson", "Sheppard West", "Downsview Park", "Finch West", "York University", "Pioneer Village",
+  "Highway 407", "Vaughan Metropolitan Centre"];
+const TRIP = [LINE1.indexOf("Eglinton"), LINE1.indexOf("St Andrew")];
 // The TTC alerts feed has nothing for Line 5, so a long gap in live train times stands in for a disruption notice.
 const LONG_WAIT_MIN = 15;
 
@@ -168,11 +175,10 @@ function render() {
   else {
     const rank = { Critical: 0, Major: 1 };
     const bySeverity = (x, y) => (rank[x.severity] ?? 2) - (rank[y.severity] ?? 2);
-    // Northbound-only notices don't affect a southbound commute.
-    const mine = alerts.filter((a) => !(/northbound/i.test(a.text) && !/southbound/i.test(a.text))).sort(bySeverity);
+    const mine = alerts.filter(onMyTrip).sort(bySeverity);
     const other = alerts.filter((a) => !mine.includes(a)).sort(bySeverity);
-    $("alerts").innerHTML = l5 + (mine.length ? mine.map(alertHtml).join("") : '<div class="alert none">No southbound or both-way alerts on Line 1.</div>') +
-      (other.length ? `<details><summary class="more">${other.length} northbound alert${other.length > 1 ? "s" : ""}</summary>${other.map(alertHtml).join("")}</details>` : "");
+    $("alerts").innerHTML = l5 + (mine.length ? mine.map(alertHtml).join("") : '<div class="alert none">Nothing on your Eglinton to St Andrew trip.</div>') +
+      (other.length ? `<details><summary class="more">${other.length} alert${other.length > 1 ? "s" : ""} not on your trip</summary>${other.map(alertHtml).join("")}</details>` : "");
   }
 
   $("l1").innerHTML = ["s", "n"].map((d) => {
@@ -202,6 +208,17 @@ function lineFiveWarnings() {
     }
   }
   return out.map((t) => `<div class="alert"><span class="ln">Line 5</span>${esc(t)} <span class="src">From live train times, not an official TTC notice.</span></div>`).join("");
+}
+
+// True unless the alert is northbound-only or names a stretch that doesn't overlap Eglinton to St Andrew.
+function onMyTrip(a) {
+  if (a.route !== "1") return false;
+  if (/northbound/i.test(a.text) && !/southbound/i.test(a.text)) return false;
+  const m = a.text.match(/(?:from|between) (.+?) (?:to|and) (.+?) stations?/i);
+  if (!m) return true;
+  const idx = [m[1], m[2]].map((n) => LINE1.findIndex((x) => x.toLowerCase() === n.trim().toLowerCase()));
+  if (idx.includes(-1)) return true;
+  return Math.min(...idx) <= TRIP[1] && Math.max(...idx) >= TRIP[0];
 }
 
 function ago(iso) {

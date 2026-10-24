@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#ff8000">
+<title>Line 5 – Laird</title>
+<style>
+  :root {
+    --bg: #f6f6f4; --card: #fff; --text: #1a1a1a; --muted: #6b6b6b;
+    --accent: #ff8000; --go: #1a8f4c; --warn: #b3261e; --line: #e4e4e0;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #121212; --card: #1e1e1e; --text: #f2f2f2; --muted: #9a9a9a; --line: #2e2e2e; --go: #46c47a; --warn: #ff7b72; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.4 system-ui, -apple-system, sans-serif; }
+  main { max-width: 480px; margin: 0 auto; padding: 16px; }
+  h1 { font-size: 15px; font-weight: 600; margin: 0 0 12px; color: var(--muted); display: flex; align-items: center; gap: 8px; }
+  h1 .badge { background: var(--accent); color: #fff; border-radius: 6px; padding: 1px 8px; font-weight: 700; }
+  .tabs { display: flex; gap: 8px; margin-bottom: 12px; }
+  .tabs button { flex: 1; padding: 10px; border-radius: 10px; border: 1px solid var(--line); background: var(--card); color: var(--text); font: inherit; font-weight: 600; }
+  .tabs button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .hero { background: var(--card); border-radius: 16px; padding: 20px; text-align: center; border: 1px solid var(--line); }
+  .hero .label { color: var(--muted); font-size: 14px; }
+  .hero .big { font-size: 56px; font-weight: 800; line-height: 1.1; margin: 4px 0; }
+  .hero .big.go { color: var(--go); }
+  .hero .big.hurry { color: var(--warn); }
+  .hero .sub { color: var(--muted); }
+  .list { background: var(--card); border-radius: 16px; border: 1px solid var(--line); margin-top: 12px; }
+  .row { display: flex; justify-content: space-between; padding: 12px 16px; border-bottom: 1px solid var(--line); }
+  .row:last-child { border-bottom: 0; }
+  .row .tag { font-size: 13px; }
+  .row .tag.ok { color: var(--go); } .row .tag.miss { color: var(--muted); }
+  .alert { background: var(--card); border-left: 4px solid var(--warn); border-radius: 10px; padding: 10px 14px; margin-top: 12px; font-size: 14px; }
+  .err { color: var(--warn); }
+  footer { margin-top: 16px; color: var(--muted); font-size: 13px; display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
+  footer input { width: 56px; padding: 6px; border-radius: 8px; border: 1px solid var(--line); background: var(--card); color: var(--text); font: inherit; }
+</style>
+</head>
+<body>
+<main>
+  <h1><span class="badge">5</span> Laird station</h1>
+  <div class="tabs" role="group" aria-label="Direction">
+    <button id="tab-w" aria-pressed="true">West → Mount Dennis</button>
+    <button id="tab-e" aria-pressed="false">East → Kennedy</button>
+  </div>
+  <div id="hero" class="hero"><div class="label">Loading…</div></div>
+  <div id="list" class="list" hidden></div>
+  <div id="alerts"></div>
+  <footer>
+    <label>Walk <input id="walk" type="number" min="0" max="60" inputmode="numeric"> + buffer <input id="buffer" type="number" min="0" max="30" inputmode="numeric"> min</label>
+    <span id="status"></span>
+  </footer>
+</main>
+<script>
+const STOPS = { w: { id: "16076", name: "Mount Dennis" }, e: { id: "16075", name: "Kennedy" } };
+const NTAS = "https://ntas.ttc.ca/api/ntas/get-next-train-time/";
+const ALERTS = "https://alerts.ttc.ca/api/alerts/live-alerts";
+const REFRESH_MS = 20000;
+
+const $ = (id) => document.getElementById(id);
+const store = {
+  get(k, d) { try { return localStorage.getItem(k) ?? d; } catch { return d; } },
+  set(k, v) { try { localStorage.setItem(k, v); } catch {} },
+};
+
+let dir = store.get("dir", "w");
+// Home to Laird is ~350 m (about 5 min on foot); the buffer covers the stairs and platform.
+let walk = Number(store.get("walk2", 5));
+let buffer = Number(store.get("buffer", 2));
+let fetched = {};   // dir -> { minutes: [..], at: ms }
+let alerts = [];
+let lastError = null;
+
+async function loadTrains(d) {
+  const res = await fetch(NTAS + STOPS[d].id, { cache: "no-store" });
+  if (!res.ok) throw new Error("TTC returned " + res.status);
+  const data = await res.json();
+  const text = (data[0] && data[0].nextTrains) || "";
+  const minutes = text.split(",").map((s) => parseInt(s, 10)).filter((n) => !isNaN(n));
+  fetched[d] = { minutes, at: Date.now() };
+}
+
+async function loadAlerts() {
+  const res = await fetch(ALERTS, { cache: "no-store" });
+  if (!res.ok) return;
+  const data = await res.json();
+  alerts = (data.routes || []).filter((r) => String(r.route) === "5");
+}
+
+async function refresh() {
+  try {
+    await Promise.all([loadTrains("w"), loadTrains("e"), loadAlerts().catch(() => {})]);
+    lastError = null;
+  } catch (e) {
+    lastError = e;
+  }
+  render();
+}
+
+function render() {
+  $("tab-w").setAttribute("aria-pressed", dir === "w");
+  $("tab-e").setAttribute("aria-pressed", dir === "e");
+  $("walk").value = walk;
+  $("buffer").value = buffer;
+  const need = walk + buffer;
+
+  const hero = $("hero"), list = $("list");
+  const f = fetched[dir];
+  if (!f) {
+    hero.innerHTML = lastError
+      ? '<div class="label err">Can\'t reach TTC data right now.<br>Check the board at the station or ttc.ca.</div>'
+      : '<div class="label">Loading…</div>';
+  } else {
+    const elapsed = (Date.now() - f.at) / 60000;
+    const trains = f.minutes.map((m) => Math.max(0, Math.round(m - elapsed)));
+    const catchable = trains.find((t) => t >= need);
+    if (!trains.length) {
+      hero.innerHTML = '<div class="label">No trains listed right now</div>';
+    } else if (catchable === undefined) {
+      hero.innerHTML = `<div class="label">You'd miss all listed trains</div>
+        <div class="big hurry">Hurry</div><div class="sub">Next is ${trains[0]} min away, you need ${need} min to get there</div>`;
+    } else {
+      const leave = catchable - need;
+      hero.innerHTML = `<div class="label">Leave in</div>
+        <div class="big ${leave <= 2 ? "hurry" : "go"}">${leave <= 0 ? "Now" : leave + " min"}</div>
+        <div class="sub">to catch the ${catchable}-min train to ${STOPS[dir].name}</div>`;
+    }
+    list.hidden = !trains.length;
+    list.innerHTML = trains.map((t) => {
+      const ok = t >= need;
+      return `<div class="row"><span>${t === 0 ? "Arriving" : t + " min"}</span>` +
+        `<span class="tag ${ok ? "ok" : "miss"}">${ok ? "leave in " + (t - need) + " min" : "too soon"}</span></div>`;
+    }).join("");
+  }
+
+  $("alerts").innerHTML = alerts.map((a) =>
+    `<div class="alert">${esc(a.title || a.headerText || "Line 5 service alert")}</div>`).join("");
+  $("status").textContent = f ? "Updated " + new Date(f.at).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" }) : "";
+}
+
+function esc(s) { return String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])); }
+
+$("tab-w").onclick = () => { dir = "w"; store.set("dir", dir); render(); };
+$("tab-e").onclick = () => { dir = "e"; store.set("dir", dir); render(); };
+$("walk").oninput = (e) => {
+  const n = Number(e.target.value);
+  if (!isNaN(n) && n >= 0) { walk = n; store.set("walk2", n); render(); }
+};
+$("buffer").oninput = (e) => {
+  const n = Number(e.target.value);
+  if (!isNaN(n) && n >= 0) { buffer = n; store.set("buffer", n); render(); }
+};
+
+refresh();
+setInterval(refresh, REFRESH_MS);
+setInterval(render, 5000);
+document.addEventListener("visibilitychange", () => { if (!document.hidden) refresh(); });
+</script>
+</body>
+</html>

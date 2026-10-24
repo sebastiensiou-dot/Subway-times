@@ -98,8 +98,7 @@ const store = {
   set(k, v) { try { localStorage.setItem(k, v); } catch {} },
 };
 
-// Heading out in the morning, heading home after noon; the buttons override.
-let mode = new Date().getHours() < 12 ? "work" : "home";
+let mode = "work";   // opens on the trip to St Andrew; the Home button switches
 // Home to Laird is ~350 m (about 5 min on foot); the buffer covers the stairs and platform.
 let walk = Number(store.get("walk2", 5));
 let buffer = Number(store.get("buffer", 2));

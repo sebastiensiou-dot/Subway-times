@@ -153,6 +153,20 @@ function live(key) {
   return f.minutes.map((m) => Math.max(0, Math.round(m - elapsed)));
 }
 
+// First train at a platform that leaves at least minT minutes from now. The TTC lists only about three trains
+// (roughly 15 min), so when none fits we extend the list at the platform's usual gap and flag it as an estimate.
+function firstTrain(key, minT) {
+  const t = live(key);
+  if (!t || !t.length) return null;
+  const hit = t.find((x) => x >= minT);
+  if (hit !== undefined) return { t: hit, est: false };
+  const diffs = t.slice(1).map((x, i) => x - t[i]).filter((d) => d > 0);
+  const gap = diffs.length ? Math.min(10, Math.max(3, Math.round(diffs.reduce((a, b) => a + b, 0) / diffs.length))) : 6;
+  let next = t[t.length - 1] + gap;
+  while (next < minT) next += gap;
+  return { t: next, est: true };
+}
+
 const clock = (minFromNow) => new Date(Date.now() + minFromNow * 60000).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
 const mins = (n) => (n === 0 ? "Now" : n + " min");
 
@@ -211,15 +225,13 @@ function renderWork() {
 function tripWork(catchable, leave) {
   const atEgl = catchable + L5_RIDE_MIN;
   let out = `<div class="sub" style="margin-top:8px">Reach Eglinton in about ${atEgl} min.`;
-  const sb = live("egl1S");
-  const next = sb && sb.find((t) => t >= atEgl + TRANSFER_MIN);
-  if (next !== undefined && next !== null) {
-    const arrive = next + L1_SB_RIDE_MIN;
-    out += ` Next Line 1 southbound you'd make is in ${next} min.</div>` +
-      `<div class="sub" style="margin-top:8px"><b>There about ${clock(arrive + walkSA)}</b> (${arrive + walkSA - leave} min door to door: ` +
-      `St Andrew platform ${clock(arrive)} + ${walkSA} min walk)`;
-  }
-  return out + "</div>";
+  const next = firstTrain("egl1S", atEgl + TRANSFER_MIN);
+  if (!next) return out + "</div>";
+  const arrive = next.t + L1_SB_RIDE_MIN;
+  out += ` Next Line 1 southbound you'd make is in ${next.t} min${next.est ? " (estimated)" : ""}.</div>` +
+    `<div class="sub" style="margin-top:8px"><b>There about ${clock(arrive + walkSA)}</b>${next.est ? " (estimated)" : ""} ` +
+    `(${arrive + walkSA - leave} min door to door: St Andrew platform ${clock(arrive)} + ${walkSA} min walk)</div>`;
+  return out;
 }
 
 function renderHome() {
@@ -236,9 +248,8 @@ function renderHome() {
   } else {
     // For each train from St Andrew: reach Eglinton, walk to Line 5, take the first eastbound you can make, ride to Laird, walk home.
     const eta = (t) => {
-      const atEgl = t + L1_NB_RIDE_MIN + TRANSFER_MIN;
-      const e = east && east.find((x) => x >= atEgl);
-      return e === undefined || e === null ? null : e + L5_RIDE_MIN + walk;
+      const e = firstTrain("eglE", t + L1_NB_RIDE_MIN + TRANSFER_MIN);
+      return e ? { min: e.t + L5_RIDE_MIN + walk, est: e.est } : null;
     };
     const catchable = trains.find((t) => t >= walkSA);
     if (catchable === undefined) {
@@ -250,14 +261,14 @@ function renderHome() {
       hero.innerHTML = `<div class="label">Leave for St Andrew in</div>
         <div class="big ${leave <= 2 ? "hurry" : "go"}">${leave <= 0 ? "Now" : leave + " min"}</div>
         <div class="sub">to catch the ${catchable}-min train to Union, then north to Eglinton</div>` +
-        (h === null ? "" : `<div class="sub" style="margin-top:8px"><b>Home about ${clock(h)}</b> (${h - leave} min door to door, including your ${walk} min walk home)</div>`);
+        (h === null ? "" : `<div class="sub" style="margin-top:8px"><b>Home about ${clock(h.min)}</b>${h.est ? " (estimated)" : ""} (${h.min - leave} min door to door, including your ${walk} min walk home)</div>`);
     }
     list.hidden = false;
     list.innerHTML = trains.map((t) => {
       const ok = t >= walkSA;
       const h = eta(t);
-      return `<div class="row"><span>${mins(t)}</span><span class="tag ${ok ? "ok" : "miss"}">${ok ? "leave in " + (t - walkSA) + " min" : "too soon"}${h === null ? "" : " · home " + clock(h)}</span></div>`;
-    }).join("");
+      return `<div class="row"><span>${mins(t)}</span><span class="tag ${ok ? "ok" : "miss"}">${ok ? "leave in " + (t - walkSA) + " min" : "too soon"}${h === null ? "" : " · home " + clock(h.min) + (h.est ? "*" : "")}</span></div>`;
+    }).join("") + (trains.some((t) => eta(t) && eta(t).est) ? '<div class="row"><span class="dest">* Estimated: the TTC lists only the next few trains, so later ones are extended at the usual gap.</span></div>' : "");
   }
   $("side-title").innerHTML = '<span class="badge">5</span> Eglinton eastbound';
   $("side").innerHTML = `<div class="row"><span class="dest">To Laird and Kennedy</span><span class="times">${

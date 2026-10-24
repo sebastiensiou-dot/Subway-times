@@ -36,6 +36,7 @@
   .err { color: var(--warn); }
   .alert .ln { font-weight: 700; margin-right: 6px; }
   .more { color: var(--muted); font-size: 14px; margin: 10px 0 0; cursor: pointer; }
+  .src { display: block; color: var(--muted); font-size: 12px; margin-top: 2px; }
   .alert.none { border-left-color: var(--go); color: var(--muted); }
   h2 { font-size: 15px; font-weight: 600; margin: 20px 0 8px; color: var(--muted); display: flex; align-items: center; gap: 8px; }
   h2 .badge { background: #ffc524; color: #1a1a1a; border-radius: 6px; padding: 1px 8px; font-weight: 700; }
@@ -70,6 +71,8 @@ const NTAS = "https://ntas.ttc.ca/api/ntas/get-next-train-time/";
 // The TTC alerts feed blocks browser requests, so a scheduled job saves it to alerts.json.
 const ALERTS = "alerts.json";
 const REFRESH_MS = 20000;
+// The TTC alerts feed has nothing for Line 5, so a long gap in live train times stands in for a disruption notice.
+const LONG_WAIT_MIN = 15;
 
 const $ = (id) => document.getElementById(id);
 const store = {
@@ -156,15 +159,16 @@ function render() {
     }).join("");
   }
 
+  const l5 = lineFiveWarnings();
   const alertHtml = (a) => `<div class="alert"><span class="ln">Line ${esc(a.route)}</span>${esc(a.text.replace(/^Line \d[^:]*:\s*/, ""))}</div>`;
-  if (!alertsChecked) $("alerts").innerHTML = "";
-  else if (!alertsOk) $("alerts").innerHTML = '<div class="alert">Service alerts may be out of date. Check ttc.ca.</div>';
-  else if (!alerts.length) $("alerts").innerHTML = '<div class="alert none">No alerts on Line 1 or Line 5</div>';
+  if (!alertsChecked) $("alerts").innerHTML = l5 + "";
+  else if (!alertsOk) $("alerts").innerHTML = l5 + '<div class="alert">Service alerts may be out of date. Check ttc.ca.</div>';
+  else if (!alerts.length) $("alerts").innerHTML = l5 + '<div class="alert none">No TTC alerts for Line 1. The TTC feed does not cover Line 5.</div>';
   else {
     const rank = { Critical: 0, Major: 1 };
     const sorted = [...alerts].sort((x, y) => (rank[x.severity] ?? 2) - (rank[y.severity] ?? 2));
     const more = sorted.slice(3);
-    $("alerts").innerHTML = sorted.slice(0, 3).map(alertHtml).join("") +
+    $("alerts").innerHTML = l5 + sorted.slice(0, 3).map(alertHtml).join("") +
       (more.length ? `<details><summary class="more">${more.length} more alert${more.length > 1 ? "s" : ""}</summary>${more.map(alertHtml).join("")}</details>` : "");
   }
 
@@ -176,6 +180,25 @@ function render() {
       x ? (t.length ? t.map((n) => (n === 0 ? "Now" : n)).join(", ") + " min" : "–") : "…"}</span></div>`;
   }).join("");
   $("status").textContent = f ? "Updated " + new Date(f.at).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" }) : "";
+}
+
+function lineFiveWarnings() {
+  const out = [];
+  for (const d of ["w", "e"]) {
+    const f = fetched[d];
+    if (!f) continue;
+    const label = d === "w" ? "Westbound" : "Eastbound";
+    const m = f.minutes;
+    if (!m.length) {
+      out.push(`${label}: no trains listed. Service may have ended or be disrupted.`);
+      continue;
+    }
+    const gaps = m.map((t, i) => (i === 0 ? t : t - m[i - 1]));
+    if (Math.max(...gaps) >= LONG_WAIT_MIN) {
+      out.push(`${label}: long gap between trains (${m.join(", ")} min). Possible delay.`);
+    }
+  }
+  return out.map((t) => `<div class="alert"><span class="ln">Line 5</span>${esc(t)} <span class="src">From live train times, not an official TTC notice.</span></div>`).join("");
 }
 
 function esc(s) { return String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])); }

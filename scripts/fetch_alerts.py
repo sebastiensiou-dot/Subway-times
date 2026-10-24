@@ -29,6 +29,7 @@ def main():
             "text": r.get("headerText") or r.get("title") or "Service alert",
             "type": r.get("alertType"),
             "severity": r.get("severity"),
+            "updated": r.get("lastUpdated"),
             "start": period.get("start"),
             "end": period.get("end"),
         })

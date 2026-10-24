@@ -160,16 +160,19 @@ function render() {
   }
 
   const l5 = lineFiveWarnings();
-  const alertHtml = (a) => `<div class="alert"><span class="ln">Line ${esc(a.route)}</span>${esc(a.text.replace(/^Line \d[^:]*:\s*/, ""))}</div>`;
+  const alertHtml = (a) => `<div class="alert"><span class="ln">Line ${esc(a.route)}</span>${esc(a.text.replace(/^Line \d[^:]*:\s*/, ""))}` +
+    `<span class="src">${a.updated ? "Updated " + ago(a.updated) : ""}${a.start && a.start > "2000" ? " · in effect since " + shortDate(a.start) : ""}</span></div>`;
   if (!alertsChecked) $("alerts").innerHTML = l5 + "";
   else if (!alertsOk) $("alerts").innerHTML = l5 + '<div class="alert">Service alerts may be out of date. Check ttc.ca.</div>';
   else if (!alerts.length) $("alerts").innerHTML = l5 + '<div class="alert none">No TTC alerts for Line 1. The TTC feed does not cover Line 5.</div>';
   else {
     const rank = { Critical: 0, Major: 1 };
-    const sorted = [...alerts].sort((x, y) => (rank[x.severity] ?? 2) - (rank[y.severity] ?? 2));
-    const more = sorted.slice(3);
-    $("alerts").innerHTML = l5 + sorted.slice(0, 3).map(alertHtml).join("") +
-      (more.length ? `<details><summary class="more">${more.length} more alert${more.length > 1 ? "s" : ""}</summary>${more.map(alertHtml).join("")}</details>` : "");
+    const bySeverity = (x, y) => (rank[x.severity] ?? 2) - (rank[y.severity] ?? 2);
+    // Northbound-only notices don't affect a southbound commute.
+    const mine = alerts.filter((a) => !(/northbound/i.test(a.text) && !/southbound/i.test(a.text))).sort(bySeverity);
+    const other = alerts.filter((a) => !mine.includes(a)).sort(bySeverity);
+    $("alerts").innerHTML = l5 + (mine.length ? mine.map(alertHtml).join("") : '<div class="alert none">No southbound or both-way alerts on Line 1.</div>') +
+      (other.length ? `<details><summary class="more">${other.length} northbound alert${other.length > 1 ? "s" : ""}</summary>${other.map(alertHtml).join("")}</details>` : "");
   }
 
   $("l1").innerHTML = ["s", "n"].map((d) => {
@@ -199,6 +202,19 @@ function lineFiveWarnings() {
     }
   }
   return out.map((t) => `<div class="alert"><span class="ln">Line 5</span>${esc(t)} <span class="src">From live train times, not an official TTC notice.</span></div>`).join("");
+}
+
+function ago(iso) {
+  const min = Math.round((Date.now() - new Date(iso).getTime()) / 60000);
+  if (min < 1) return "just now";
+  if (min < 60) return min + " min ago";
+  if (min < 1440) return Math.round(min / 60) + " h ago";
+  if (min < 7 * 1440) return Math.round(min / 1440) + " days ago";
+  return shortDate(iso);
+}
+
+function shortDate(iso) {
+  return new Date(iso).toLocaleDateString([], { month: "short", day: "numeric" });
 }
 
 function esc(s) { return String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])); }

@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#ff8000">
-<title>Line 5 – Laird</title>
+<title>Subway Times</title>
 <style>
   :root {
     --bg: #f6f6f4; --card: #fff; --text: #1a1a1a; --muted: #6b6b6b;
@@ -34,6 +34,14 @@
   .row .tag.ok { color: var(--go); } .row .tag.miss { color: var(--muted); }
   .alert { background: var(--card); border-left: 4px solid var(--warn); border-radius: 10px; padding: 10px 14px; margin-top: 12px; font-size: 14px; }
   .err { color: var(--warn); }
+  .alert .ln { font-weight: 700; margin-right: 6px; }
+  .more { color: var(--muted); font-size: 14px; margin: 10px 0 0; cursor: pointer; }
+  .alert.none { border-left-color: var(--go); color: var(--muted); }
+  h2 { font-size: 15px; font-weight: 600; margin: 20px 0 8px; color: var(--muted); display: flex; align-items: center; gap: 8px; }
+  h2 .badge { background: #ffc524; color: #1a1a1a; border-radius: 6px; padding: 1px 8px; font-weight: 700; }
+  .l1 .row { align-items: center; }
+  .l1 .dest { font-size: 13px; color: var(--muted); }
+  .l1 .times { font-weight: 700; font-size: 18px; text-align: right; }
   footer { margin-top: 16px; color: var(--muted); font-size: 13px; display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
   footer input { width: 56px; padding: 6px; border-radius: 8px; border: 1px solid var(--line); background: var(--card); color: var(--text); font: inherit; }
 </style>
@@ -45,9 +53,11 @@
     <button id="tab-w" aria-pressed="true">West → Mount Dennis</button>
     <button id="tab-e" aria-pressed="false">East → Kennedy</button>
   </div>
+  <div id="alerts"></div>
   <div id="hero" class="hero"><div class="label">Loading…</div></div>
   <div id="list" class="list" hidden></div>
-  <div id="alerts"></div>
+  <h2><span class="badge">1</span> Eglinton station</h2>
+  <div id="l1" class="list l1"><div class="row">Loading…</div></div>
   <footer>
     <label>Walk <input id="walk" type="number" min="0" max="60" inputmode="numeric"> + buffer <input id="buffer" type="number" min="0" max="30" inputmode="numeric"> min</label>
     <span id="status"></span>
@@ -55,8 +65,10 @@
 </main>
 <script>
 const STOPS = { w: { id: "16076", name: "Mount Dennis" }, e: { id: "16075", name: "Kennedy" } };
+const L1 = { s: { id: "13795", name: "Southbound to Union" }, n: { id: "13796", name: "Northbound to Finch" } };
 const NTAS = "https://ntas.ttc.ca/api/ntas/get-next-train-time/";
-const ALERTS = "https://alerts.ttc.ca/api/alerts/live-alerts";
+// The TTC alerts feed blocks browser requests, so a scheduled job saves it to alerts.json.
+const ALERTS = "alerts.json";
 const REFRESH_MS = 20000;
 
 const $ = (id) => document.getElementById(id);
@@ -71,10 +83,12 @@ let walk = Number(store.get("walk2", 5));
 let buffer = Number(store.get("buffer", 2));
 let fetched = {};   // dir -> { minutes: [..], at: ms }
 let alerts = [];
+let alertsOk = false;
+let alertsChecked = 0;
 let lastError = null;
 
 async function loadTrains(d) {
-  const res = await fetch(NTAS + STOPS[d].id, { cache: "no-store" });
+  const res = await fetch(NTAS + (STOPS[d] || L1[d]).id, { cache: "no-store" });
   if (!res.ok) throw new Error("TTC returned " + res.status);
   const data = await res.json();
   const text = (data[0] && data[0].nextTrains) || "";
@@ -86,12 +100,19 @@ async function loadAlerts() {
   const res = await fetch(ALERTS, { cache: "no-store" });
   if (!res.ok) return;
   const data = await res.json();
-  alerts = (data.routes || []).filter((r) => String(r.route) === "5");
+  const now = Date.now();
+  alertsChecked = new Date(data.checked).getTime();
+  alerts = (data.alerts || []).filter((a) => {
+    const start = a.start ? new Date(a.start).getTime() : 0;
+    const end = a.end ? new Date(a.end).getTime() : 0;
+    return start <= now && (end < Date.UTC(2000, 0, 1) || end >= now);
+  });
+  alertsOk = Date.now() - alertsChecked < 3 * 3600 * 1000;
 }
 
 async function refresh() {
   try {
-    await Promise.all([loadTrains("w"), loadTrains("e"), loadAlerts().catch(() => {})]);
+    await Promise.all([loadTrains("w"), loadTrains("e"), loadTrains("s"), loadTrains("n"), loadAlerts().catch(() => {})]);
     lastError = null;
   } catch (e) {
     lastError = e;
@@ -135,8 +156,25 @@ function render() {
     }).join("");
   }
 
-  $("alerts").innerHTML = alerts.map((a) =>
-    `<div class="alert">${esc(a.title || a.headerText || "Line 5 service alert")}</div>`).join("");
+  const alertHtml = (a) => `<div class="alert"><span class="ln">Line ${esc(a.route)}</span>${esc(a.text.replace(/^Line \d[^:]*:\s*/, ""))}</div>`;
+  if (!alertsChecked) $("alerts").innerHTML = "";
+  else if (!alertsOk) $("alerts").innerHTML = '<div class="alert">Service alerts may be out of date. Check ttc.ca.</div>';
+  else if (!alerts.length) $("alerts").innerHTML = '<div class="alert none">No alerts on Line 1 or Line 5</div>';
+  else {
+    const rank = { Critical: 0, Major: 1 };
+    const sorted = [...alerts].sort((x, y) => (rank[x.severity] ?? 2) - (rank[y.severity] ?? 2));
+    const more = sorted.slice(3);
+    $("alerts").innerHTML = sorted.slice(0, 3).map(alertHtml).join("") +
+      (more.length ? `<details><summary class="more">${more.length} more alert${more.length > 1 ? "s" : ""}</summary>${more.map(alertHtml).join("")}</details>` : "");
+  }
+
+  $("l1").innerHTML = ["s", "n"].map((d) => {
+    const x = fetched[d];
+    const el = x ? (Date.now() - x.at) / 60000 : 0;
+    const t = x ? x.minutes.map((m) => Math.max(0, Math.round(m - el))) : [];
+    return `<div class="row"><span class="dest">${L1[d].name}</span><span class="times">${
+      x ? (t.length ? t.map((n) => (n === 0 ? "Now" : n)).join(", ") + " min" : "–") : "…"}</span></div>`;
+  }).join("");
   $("status").textContent = f ? "Updated " + new Date(f.at).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" }) : "";
 }
 

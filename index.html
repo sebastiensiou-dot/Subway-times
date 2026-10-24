@@ -44,6 +44,7 @@
   .l1 .dest { font-size: 13px; color: var(--muted); }
   .l1 .times { font-weight: 700; font-size: 18px; text-align: right; }
   footer { margin-top: 16px; color: var(--muted); font-size: 13px; display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
+  footer label { white-space: nowrap; }
   footer input { width: 56px; padding: 6px; border-radius: 8px; border: 1px solid var(--line); background: var(--card); color: var(--text); font: inherit; }
 </style>
 </head>
@@ -60,7 +61,8 @@
   <h2 id="side-title"></h2>
   <div id="side" class="list l1"><div class="row">Loading…</div></div>
   <footer>
-    <label>Walk <input id="walk" type="number" min="0" max="60" inputmode="numeric"> + buffer <input id="buffer" type="number" min="0" max="30" inputmode="numeric"> min</label>
+    <label>Home walk <input id="walk" type="number" min="0" max="60" inputmode="numeric"> + buffer <input id="buffer" type="number" min="0" max="30" inputmode="numeric"> min</label>
+    <label>St Andrew walk <input id="walkSA" type="number" min="0" max="60" inputmode="numeric"> min</label>
     <span id="status"></span>
   </footer>
 </main>
@@ -102,6 +104,8 @@ let mode = "work";   // opens on the trip to St Andrew; the Home button switches
 // Home to Laird is ~350 m (about 5 min on foot); the buffer covers the stairs and platform.
 let walk = Number(store.get("walk2", 5));
 let buffer = Number(store.get("buffer", 2));
+// Walk between the St Andrew platform and where you are going (change it in the footer).
+let walkSA = Number(store.get("walkSA", 5));
 let fetched = {};   // stop key -> { minutes: [..], at: ms }
 let alerts = [];
 let alertsOk = false;
@@ -157,6 +161,7 @@ function render() {
   $("tab-home").setAttribute("aria-pressed", mode === "home");
   $("walk").value = walk;
   $("buffer").value = buffer;
+  $("walkSA").value = walkSA;
   if (mode === "work") renderWork(); else renderHome();
   renderAlerts();
   const f = fetched.laird;
@@ -211,7 +216,8 @@ function tripWork(catchable, leave) {
   if (next !== undefined && next !== null) {
     const arrive = next + L1_SB_RIDE_MIN;
     out += ` Next Line 1 southbound you'd make is in ${next} min.</div>` +
-      `<div class="sub" style="margin-top:8px"><b>St Andrew about ${clock(arrive)}</b> (${arrive - leave} min after you leave the house)`;
+      `<div class="sub" style="margin-top:8px"><b>There about ${clock(arrive + walkSA)}</b> (${arrive + walkSA - leave} min door to door: ` +
+      `St Andrew platform ${clock(arrive)} + ${walkSA} min walk)`;
   }
   return out + "</div>";
 }
@@ -234,15 +240,23 @@ function renderHome() {
       const e = east && east.find((x) => x >= atEgl);
       return e === undefined || e === null ? null : e + L5_RIDE_MIN + walk;
     };
-    const first = eta(trains[0]);
-    hero.innerHTML = `<div class="label">Next train at St Andrew</div>
-      <div class="big go">${mins(trains[0])}</div>
-      <div class="sub">to Union, then north to Eglinton</div>` +
-      (first === null ? "" : `<div class="sub" style="margin-top:8px"><b>Home about ${clock(first)}</b> (${first} min from now)</div>`);
+    const catchable = trains.find((t) => t >= walkSA);
+    if (catchable === undefined) {
+      hero.innerHTML = `<div class="label">You'd miss all listed trains</div>
+        <div class="big hurry">Hurry</div><div class="sub">Next is ${trains[0]} min away, you need ${walkSA} min to get to the platform</div>`;
+    } else {
+      const leave = catchable - walkSA;
+      const h = eta(catchable);
+      hero.innerHTML = `<div class="label">Leave for St Andrew in</div>
+        <div class="big ${leave <= 2 ? "hurry" : "go"}">${leave <= 0 ? "Now" : leave + " min"}</div>
+        <div class="sub">to catch the ${catchable}-min train to Union, then north to Eglinton</div>` +
+        (h === null ? "" : `<div class="sub" style="margin-top:8px"><b>Home about ${clock(h)}</b> (${h - leave} min door to door, including your ${walk} min walk home)</div>`);
+    }
     list.hidden = false;
     list.innerHTML = trains.map((t) => {
+      const ok = t >= walkSA;
       const h = eta(t);
-      return `<div class="row"><span>${mins(t)}</span><span class="tag ok">${h === null ? "" : "home about " + clock(h)}</span></div>`;
+      return `<div class="row"><span>${mins(t)}</span><span class="tag ${ok ? "ok" : "miss"}">${ok ? "leave in " + (t - walkSA) + " min" : "too soon"}${h === null ? "" : " · home " + clock(h)}</span></div>`;
     }).join("");
   }
   $("side-title").innerHTML = '<span class="badge">5</span> Eglinton eastbound';
@@ -317,6 +331,10 @@ $("tab-home").onclick = () => { mode = "home"; render(); };
 $("walk").oninput = (e) => {
   const n = Number(e.target.value);
   if (!isNaN(n) && n >= 0) { walk = n; store.set("walk2", n); render(); }
+};
+$("walkSA").oninput = (e) => {
+  const n = Number(e.target.value);
+  if (!isNaN(n) && n >= 0) { walkSA = n; store.set("walkSA", n); render(); }
 };
 $("buffer").oninput = (e) => {
   const n = Number(e.target.value);

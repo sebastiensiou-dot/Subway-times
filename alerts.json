@@ -1,5 +1,5 @@
 {
- "checked": "2026-10-27T00:00:00+00:00",
+ "checked": "2026-10-27T05:00:00+00:00",
  "alerts": [
   {
    "route": "1",
@@ -99,6 +99,24 @@
    "updated": "2026-10-23T09:25:58.727Z",
    "start": "2026-10-23T09:24:34Z",
    "end": "2026-10-29T23:59:00Z"
+  },
+  {
+   "route": "1",
+   "text": "Line 1 Yonge-University: There is no subway service between Lawrence West and St George stations due to planned track work. Shuttle buses are running.",
+   "type": "Planned",
+   "severity": "Critical",
+   "updated": "2026-10-26T23:59:02.67Z",
+   "start": "2026-10-26T23:59:00Z",
+   "end": "2026-10-27T03:30:00Z"
+  },
+  {
+   "route": "1",
+   "text": "Line 1 Yonge-University: Delays southbound from Davisville to Union stations due to service adjustments",
+   "type": "Planned",
+   "severity": "Critical",
+   "updated": "2026-10-27T01:02:01.813Z",
+   "start": "2026-10-27T01:02:01.813Z",
+   "end": "2026-10-27T02:00:00Z"
   }
  ]
 }

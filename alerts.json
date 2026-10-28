@@ -1,5 +1,5 @@
 {
- "checked": "2026-10-28T11:00:00+00:00",
+ "checked": "2026-10-28T17:00:00+00:00",
  "alerts": [
   {
    "route": "1",
@@ -39,10 +39,10 @@
   },
   {
    "route": "1",
-   "text": "Line 1 Yonge-University: Subway trains will move slower than usual northbound from Union to King stations while we work on track issues.",
+   "text": "Line 1 Yonge-University: Subway trains will move slower than usual northbound from Union to King stations while we work on track issues",
    "type": "Planned",
    "severity": "Minor",
-   "updated": "2026-10-05T11:08:08.803Z",
+   "updated": "2026-10-28T09:57:11.51Z",
    "start": "2026-08-10T11:07:38Z",
    "end": "0001-01-01T00:00:00Z"
   },
@@ -99,6 +99,15 @@
    "updated": "2026-10-23T09:25:58.727Z",
    "start": "2026-10-23T09:24:34Z",
    "end": "2026-10-29T23:59:00Z"
+  },
+  {
+   "route": "1",
+   "text": "Line 1 Yonge-University: Subway trains will move slower than usual northbound from Queen to TMU stations while we work on track issues",
+   "type": "Planned",
+   "severity": "Minor",
+   "updated": "2026-10-28T09:57:49.567Z",
+   "start": "2026-10-28T09:57:49.567Z",
+   "end": "0001-01-01T00:00:00Z"
   }
  ]
 }

@@ -1,5 +1,5 @@
 {
- "checked": "2026-10-29T01:00:00+00:00",
+ "checked": "2026-10-29T07:00:00+00:00",
  "alerts": [
   {
    "route": "1",
@@ -111,12 +111,12 @@
   },
   {
    "route": "1",
-   "text": "Line 1 Yonge-University: Regular service has resumed at Spadina station.",
+   "text": "Line 1 Yonge-University: There is no subway service between Lawrence West and St George stations due to planned track work. Shuttle buses are running.",
    "type": "Planned",
-   "severity": "Regular",
-   "updated": "2026-10-28T21:11:35.937Z",
-   "start": "2026-10-28T21:11:35.937Z",
-   "end": "2026-10-28T21:26:35.937Z"
+   "severity": "Critical",
+   "updated": "2026-10-28T23:59:02.737Z",
+   "start": "2026-10-28T23:59:00Z",
+   "end": "2026-10-29T03:30:00Z"
   }
  ]
 }

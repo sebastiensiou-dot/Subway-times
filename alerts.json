@@ -1,5 +1,5 @@
 {
- "checked": "2026-10-28T21:00:00+00:00",
+ "checked": "2026-10-29T01:00:00+00:00",
  "alerts": [
   {
    "route": "1",
@@ -108,6 +108,15 @@
    "updated": "2026-10-28T09:57:49.567Z",
    "start": "2026-10-28T09:57:49.567Z",
    "end": "0001-01-01T00:00:00Z"
+  },
+  {
+   "route": "1",
+   "text": "Line 1 Yonge-University: Regular service has resumed at Spadina station.",
+   "type": "Planned",
+   "severity": "Regular",
+   "updated": "2026-10-28T21:11:35.937Z",
+   "start": "2026-10-28T21:11:35.937Z",
+   "end": "2026-10-28T21:26:35.937Z"
   }
  ]
 }

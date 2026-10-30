@@ -1,5 +1,5 @@
 {
- "checked": "2026-10-30T16:00:00+00:00",
+ "checked": "2026-10-30T20:00:00+00:00",
  "alerts": [
   {
    "route": "1",
@@ -99,6 +99,15 @@
    "updated": "2026-10-28T09:57:49.567Z",
    "start": "2026-10-28T09:57:49.567Z",
    "end": "0001-01-01T00:00:00Z"
+  },
+  {
+   "route": "1",
+   "text": "Line 1 Yonge-University: There will be no subway service between Lawrence West and St Andrew stations, starting 11:59 p.m., nightly Monday, November 2 to Friday, November 6, due to planned track work. Shuttle buses will operate between Lawrence West and St George.",
+   "type": "Planned",
+   "severity": "Critical",
+   "updated": "2026-10-30T14:36:14.51Z",
+   "start": "2026-10-30T14:36:14.51Z",
+   "end": "2026-11-02T23:59:00Z"
   }
  ]
 }

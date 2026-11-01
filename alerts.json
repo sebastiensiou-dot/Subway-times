@@ -1,5 +1,5 @@
 {
- "checked": "2026-11-01T08:00:00+00:00",
+ "checked": "2026-11-01T15:00:00+00:00",
  "alerts": [
   {
    "route": "1",
@@ -108,15 +108,6 @@
    "updated": "2026-10-30T14:36:14.51Z",
    "start": "2026-10-30T14:36:14.51Z",
    "end": "2026-11-02T23:59:00Z"
-  },
-  {
-   "route": "1",
-   "text": "Line 1 Yonge-University: Regular service has resumed between Finch and Vaughan stations.",
-   "type": "Planned",
-   "severity": "Regular",
-   "updated": "2026-11-01T03:00:03.867Z",
-   "start": "2026-11-01T03:00:03.867Z",
-   "end": "2026-11-01T03:15:03.867Z"
   }
  ]
 }

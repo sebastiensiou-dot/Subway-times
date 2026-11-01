@@ -1,5 +1,5 @@
 {
- "checked": "2026-10-31T22:00:00+00:00",
+ "checked": "2026-11-01T01:00:00+00:00",
  "alerts": [
   {
    "route": "1",
@@ -111,12 +111,21 @@
   },
   {
    "route": "1",
-   "text": "Line 1 Yonge-University: Regular service has resumed between St George and Spadina stations.",
+   "text": "Line 1 Yonge-University: No service between Eglinton and Lawrence stations due to the power being shut off at track level Shuttle buses are on the way. Thank you for your patience.",
+   "type": "Planned",
+   "severity": "Critical",
+   "updated": "2026-10-31T21:33:11.837Z",
+   "start": "2026-10-31T21:17:23Z",
+   "end": "0001-01-01T00:00:00Z"
+  },
+  {
+   "route": "1",
+   "text": "Line 1 Yonge-University: Regular service has resumed southbound at York Mills station.",
    "type": "Planned",
    "severity": "Regular",
-   "updated": "2026-10-31T18:55:30.207Z",
-   "start": "2026-10-31T18:55:30.207Z",
-   "end": "2026-10-31T19:10:30.207Z"
+   "updated": "2026-10-31T21:36:25.02Z",
+   "start": "2026-10-31T21:36:25.02Z",
+   "end": "2026-10-31T21:51:25.02Z"
   }
  ]
 }

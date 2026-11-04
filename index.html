@@ -145,7 +145,7 @@ async function loadAlerts() {
     const end = a.end ? new Date(a.end).getTime() : 0;
     return start <= now && (end < Date.UTC(2000, 0, 1) || end >= now);
   });
-  alertsOk = Date.now() - alertsChecked < 3 * 3600 * 1000;
+  alertsOk = true;
 }
 
 async function refresh() {
@@ -295,16 +295,18 @@ function renderAlerts() {
   const l5 = lineFiveWarnings();
   const alertHtml = (a) => `<div class="alert"><span class="ln">Line ${esc(a.route)}</span>${esc(a.text.replace(/^Line \d[^:]*:\s*/, ""))}` +
     `<span class="src">${a.updated ? "Updated " + ago(a.updated) : ""}${a.start && a.start > "2000" ? " · in effect since " + shortDate(a.start) : ""}</span></div>`;
+  // The saved alerts can be hours old (GitHub runs the job only a few times a day), so always say how old.
+  const stale = alertsChecked && Date.now() - alertsChecked > 2 * 3600 * 1000;
+  const freshness = alertsChecked ? `<div class="src" style="margin:8px 2px 0">TTC alerts last copied ${ago(new Date(alertsChecked).toISOString())}${stale ? ". They may be missing something new, so check ttc.ca if it matters." : "."}</div>` : "";
   if (!alertsChecked) $("alerts").innerHTML = l5 + "";
-  else if (!alertsOk) $("alerts").innerHTML = l5 + '<div class="alert">Service alerts may be out of date. Check ttc.ca.</div>';
-  else if (!alerts.length) $("alerts").innerHTML = l5 + '<div class="alert none">No TTC alerts for Line 1. The TTC feed does not cover Line 5.</div>';
+  else if (!alerts.length) $("alerts").innerHTML = l5 + '<div class="alert none">No TTC alerts for Line 1. The TTC feed does not cover Line 5.</div>' + freshness;
   else {
     const rank = { Critical: 0, Major: 1 };
     const bySeverity = (x, y) => (rank[x.severity] ?? 2) - (rank[y.severity] ?? 2);
     const mine = alerts.filter(onMyTrip).sort(bySeverity);
     const other = alerts.filter((a) => !mine.includes(a)).sort(bySeverity);
     $("alerts").innerHTML = l5 + (mine.length ? mine.map(alertHtml).join("") : `<div class="alert none">Nothing on your Eglinton to ${DESTS[dest].name} trip.</div>`) +
-      (other.length ? `<details><summary class="more">${other.length} alert${other.length > 1 ? "s" : ""} not on your trip</summary>${other.map(alertHtml).join("")}</details>` : "");
+      (other.length ? `<details><summary class="more">${other.length} alert${other.length > 1 ? "s" : ""} not on your trip</summary>${other.map(alertHtml).join("")}</details>` : "") + freshness;
   }
 }
 

@@ -35,9 +35,9 @@ def main():
         })
     alerts.sort(key=lambda a: (a["route"], a["start"] or ""))
 
-    # Rounded to the hour so the file only changes (and commits) when alerts
-    # change or once an hour, while still showing the page when the job stalls.
-    checked = datetime.now(timezone.utc).replace(minute=0, second=0, microsecond=0)
+    # GitHub runs this schedule only a few times a day, so every run is committed with its exact time
+    # and the page can show how old the alerts are.
+    checked = datetime.now(timezone.utc).replace(microsecond=0)
     OUT.write_text(json.dumps({"checked": checked.isoformat(), "alerts": alerts}, indent=1) + "\n")
 
 

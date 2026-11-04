@@ -1,12 +1,12 @@
 {
- "checked": "2026-11-04T17:21:18+00:00",
+ "checked": "2026-11-04T22:43:22+00:00",
  "alerts": [
   {
    "route": "1",
-   "text": "Line 1 Yonge-University: Subway trains will move slower than usual northbound from Wilson to Sheppard West stations while we work on track issues.",
+   "text": "Line 1 Yonge-University: Subway trains will move slower than usual northbound from Wilson to Sheppard West stations while we work on track issues Thank you for your patience.",
    "type": "Planned",
    "severity": "Minor",
-   "updated": "2026-09-10T10:50:52.553Z",
+   "updated": "2026-11-04T14:40:31.023Z",
    "start": "2026-07-20T12:57:46Z",
    "end": "0001-01-01T00:00:00Z"
   },
@@ -48,20 +48,20 @@
   },
   {
    "route": "1",
-   "text": "Line 1 Yonge-University: Subway trains will move slower than usual northbound from Davisville to Eglinton stations while we work on track issues.",
+   "text": "Line 1 Yonge-University: Subway trains will move slower than usual northbound from Davisville to Eglinton stations while we work on track issues Thank you for your patience.",
    "type": "Planned",
    "severity": "Minor",
-   "updated": "2026-08-31T10:18:04.087Z",
+   "updated": "2026-11-04T14:41:52.887Z",
    "start": "2026-08-20T10:23:02Z",
    "end": "0001-01-01T00:00:00Z"
   },
   {
    "route": "1",
-   "text": "Line 1 Yonge-University: Subway trains will move slower than usual northbound from TMU to College stations while we work on track issues.",
+   "text": "Line 1 Yonge-University: Subway trains will move slower than usual northbound from TMU to College stations while we work on track issues Thank you for your patience.",
    "type": "Planned",
    "severity": "Minor",
-   "updated": "2026-09-14T10:26:30.187Z",
-   "start": "2026-09-14T10:26:30.187Z",
+   "updated": "2026-11-04T14:41:29.133Z",
+   "start": "2026-09-14T10:26:30Z",
    "end": "0001-01-01T00:00:00Z"
   },
   {
@@ -71,24 +71,6 @@
    "severity": "Minor",
    "updated": "2026-10-22T09:54:31.707Z",
    "start": "2026-09-16T10:52:55Z",
-   "end": "0001-01-01T00:00:00Z"
-  },
-  {
-   "route": "1",
-   "text": "Line 1 Yonge-University: Subway trains will move slower than usual southbound from Sheppard-Yonge to York Mills stations while we work on track issues.",
-   "type": "Planned",
-   "severity": "Minor",
-   "updated": "2026-10-05T11:19:22.643Z",
-   "start": "2026-10-05T11:19:22.643Z",
-   "end": "0001-01-01T00:00:00Z"
-  },
-  {
-   "route": "1",
-   "text": "Line 1 Yonge-University: Subway trains will move slower than usual northbound from York Mills to Sheppard-Yonge stations while we work on track issues",
-   "type": "Planned",
-   "severity": "Minor",
-   "updated": "2026-10-22T09:54:15.443Z",
-   "start": "2026-10-20T10:09:08Z",
    "end": "0001-01-01T00:00:00Z"
   },
   {
@@ -108,6 +90,24 @@
    "updated": "2026-11-03T10:51:56.84Z",
    "start": "2026-11-03T10:51:56.84Z",
    "end": "2026-11-06T23:59:00Z"
+  },
+  {
+   "route": "1",
+   "text": "Line 1 Yonge-University: Subway trains will move slower than usual northbound from Spadina to Dupont stations while we work on track issues Thank you for your patience.",
+   "type": "Planned",
+   "severity": "Minor",
+   "updated": "2026-11-04T14:23:59.56Z",
+   "start": "2026-11-04T14:23:59.56Z",
+   "end": "0001-01-01T00:00:00Z"
+  },
+  {
+   "route": "1",
+   "text": "Line 1 Yonge-University: Subway trains will move slower than usual southbound from Yorkdale to Lawrence West stations while we work on track issues Thank you for your patience.",
+   "type": "Planned",
+   "severity": "Minor",
+   "updated": "2026-11-04T14:29:15.237Z",
+   "start": "2026-11-04T14:29:15.237Z",
+   "end": "0001-01-01T00:00:00Z"
   }
  ]
 }

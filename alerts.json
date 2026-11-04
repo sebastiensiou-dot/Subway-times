@@ -1,5 +1,5 @@
 {
- "checked": "2026-11-03T22:00:00+00:00",
+ "checked": "2026-11-04T02:00:00+00:00",
  "alerts": [
   {
    "route": "1",
@@ -108,15 +108,6 @@
    "updated": "2026-11-03T10:51:56.84Z",
    "start": "2026-11-03T10:51:56.84Z",
    "end": "2026-11-06T23:59:00Z"
-  },
-  {
-   "route": "5",
-   "text": "Line 5 Eglinton: Delays westbound from Laird to Mount Dennis stations due to an earlier mechanical problem at Laird station. Thank you for your patience.",
-   "type": "Planned",
-   "severity": "Critical",
-   "updated": "2026-11-03T16:36:45.277Z",
-   "start": "2026-11-03T16:36:45.277Z",
-   "end": "2026-11-03T17:06:00Z"
   }
  ]
 }

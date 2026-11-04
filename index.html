@@ -303,10 +303,13 @@ function renderAlerts() {
   else {
     const rank = { Critical: 0, Major: 1 };
     const bySeverity = (x, y) => (rank[x.severity] ?? 2) - (rank[y.severity] ?? 2);
-    const mine = alerts.filter(onMyTrip).sort(bySeverity);
+    // Only alerts the TTC touched in the last week are shown up front, even on your route; the rest are collapsed.
+    const weekAgo = Date.now() - 7 * 86400000;
+    const recent = (a) => !a.updated || new Date(a.updated).getTime() >= weekAgo;
+    const mine = alerts.filter((a) => onMyTrip(a) && recent(a)).sort(bySeverity);
     const other = alerts.filter((a) => !mine.includes(a)).sort(bySeverity);
-    $("alerts").innerHTML = l5 + (mine.length ? mine.map(alertHtml).join("") : `<div class="alert none">Nothing on your Eglinton to ${DESTS[dest].name} trip.</div>`) +
-      (other.length ? `<details><summary class="more">${other.length} alert${other.length > 1 ? "s" : ""} not on your trip</summary>${other.map(alertHtml).join("")}</details>` : "") + freshness;
+    $("alerts").innerHTML = l5 + (mine.length ? mine.map(alertHtml).join("") : `<div class="alert none">Nothing new this week on your Eglinton to ${DESTS[dest].name} trip.</div>`) +
+      (other.length ? `<details><summary class="more">${other.length} older or off-route alert${other.length > 1 ? "s" : ""}</summary>${other.map(alertHtml).join("")}</details>` : "") + freshness;
   }
 }
 

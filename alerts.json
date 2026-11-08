@@ -1,5 +1,5 @@
 {
- "checked": "2026-11-08T02:05:59+00:00",
+ "checked": "2026-11-08T08:54:09+00:00",
  "alerts": [
   {
    "route": "1",
@@ -108,24 +108,6 @@
    "updated": "2026-11-06T14:05:55.427Z",
    "start": "2026-11-06T14:05:55.427Z",
    "end": "2026-11-12T23:00:00Z"
-  },
-  {
-   "route": "1",
-   "text": "Line 1 Yonge-University: Delays northbound at Museum station due to a medical emergency Thank you for your patience.",
-   "type": "Planned",
-   "severity": "Critical",
-   "updated": "2026-11-07T20:59:49.973Z",
-   "start": "2026-11-07T20:59:49.973Z",
-   "end": "0001-01-01T00:00:00Z"
-  },
-  {
-   "route": "5",
-   "text": "Line 5 Eglinton: Delays between Mount Dennis and Kennedy stations while the maintainer fixes a signal issue Thank you for your patience. Line 5 is owned by Metrolinx, maintained by Crosslinx Transit Solutions Maintenance and proudly operated by the TTC.",
-   "type": "Planned",
-   "severity": "Critical",
-   "updated": "2026-11-07T20:50:26.2Z",
-   "start": "2026-11-07T20:50:26.2Z",
-   "end": "0001-01-01T00:00:00Z"
   }
  ]
 }

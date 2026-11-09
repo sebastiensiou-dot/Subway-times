@@ -1,5 +1,5 @@
 {
- "checked": "2026-11-09T10:40:29+00:00",
+ "checked": "2026-11-09T21:06:37+00:00",
  "alerts": [
   {
    "route": "1",
@@ -30,19 +30,10 @@
   },
   {
    "route": "1",
-   "text": "Line 1 Yonge-University: Subway trains will move slower than usual southbound from Cedarvale to St Clair West stations while we work on track issues",
+   "text": "Line 1 Yonge-University: Subway trains will move slower than usual northbound from Union to King stations while we work on track issues Thank you for your patience.",
    "type": "Planned",
    "severity": "Minor",
-   "updated": "2026-10-14T10:09:29.147Z",
-   "start": "2026-07-22T10:47:25Z",
-   "end": "0001-01-01T00:00:00Z"
-  },
-  {
-   "route": "1",
-   "text": "Line 1 Yonge-University: Subway trains will move slower than usual northbound from Union to King stations while we work on track issues",
-   "type": "Planned",
-   "severity": "Minor",
-   "updated": "2026-10-28T09:57:11.51Z",
+   "updated": "2026-11-09T09:50:36.347Z",
    "start": "2026-08-10T11:07:38Z",
    "end": "0001-01-01T00:00:00Z"
   },
@@ -51,7 +42,7 @@
    "text": "Line 1 Yonge-University: Subway trains will move slower than usual northbound from Davisville to Eglinton stations while we work on track issues Thank you for your patience.",
    "type": "Planned",
    "severity": "Minor",
-   "updated": "2026-11-04T14:41:52.887Z",
+   "updated": "2026-11-09T09:51:04.703Z",
    "start": "2026-08-20T10:23:02Z",
    "end": "0001-01-01T00:00:00Z"
   },
@@ -66,10 +57,10 @@
   },
   {
    "route": "1",
-   "text": "Line 1 Yonge-University: Subway trains will move slower than usual northbound from Bloor-Yonge to Rosedale stations while we work on track issues",
+   "text": "Line 1 Yonge-University: Subway trains will move slower than usual northbound from Bloor-Yonge to Rosedale stations while we work on track issues Thank you for your patience.",
    "type": "Planned",
    "severity": "Minor",
-   "updated": "2026-10-22T09:54:31.707Z",
+   "updated": "2026-11-09T09:50:50.197Z",
    "start": "2026-09-16T10:52:55Z",
    "end": "0001-01-01T00:00:00Z"
   },
@@ -89,15 +80,6 @@
    "severity": "Minor",
    "updated": "2026-11-04T14:23:59.56Z",
    "start": "2026-11-04T14:23:59.56Z",
-   "end": "0001-01-01T00:00:00Z"
-  },
-  {
-   "route": "1",
-   "text": "Line 1 Yonge-University: Subway trains will move slower than usual southbound from Yorkdale to Lawrence West stations while we work on track issues Thank you for your patience.",
-   "type": "Planned",
-   "severity": "Minor",
-   "updated": "2026-11-04T14:29:15.237Z",
-   "start": "2026-11-04T14:29:15.237Z",
    "end": "0001-01-01T00:00:00Z"
   },
   {

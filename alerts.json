@@ -1,5 +1,5 @@
 {
- "checked": "2026-11-12T00:33:39+00:00",
+ "checked": "2026-11-12T07:39:39+00:00",
  "alerts": [
   {
    "route": "1",
@@ -99,6 +99,15 @@
    "updated": "2026-11-11T10:31:36.67Z",
    "start": "2026-11-11T10:31:36.67Z",
    "end": "0001-01-01T00:00:00Z"
+  },
+  {
+   "route": "1",
+   "text": "Line 1 Yonge-University: There is limited subway service between Vaughan and Finch West stations due to structural maintenance Thank you for your patience.",
+   "type": "Planned",
+   "severity": "Major",
+   "updated": "2026-11-11T23:00:00.74Z",
+   "start": "2026-11-11T23:00:00Z",
+   "end": "2026-11-12T03:30:00Z"
   }
  ]
 }

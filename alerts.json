@@ -1,5 +1,5 @@
 {
- "checked": "2026-11-14T02:43:25+00:00",
+ "checked": "2026-11-14T09:27:30+00:00",
  "alerts": [
   {
    "route": "1",
@@ -90,15 +90,6 @@
    "updated": "2026-11-11T10:31:36.67Z",
    "start": "2026-11-11T10:31:36.67Z",
    "end": "0001-01-01T00:00:00Z"
-  },
-  {
-   "route": "1",
-   "text": "Line 1 Yonge-University: Regular service has resumed between St George and Wilson stations.",
-   "type": "Planned",
-   "severity": "Regular",
-   "updated": "2026-11-13T21:29:27.627Z",
-   "start": "2026-11-13T21:29:27.627Z",
-   "end": "2026-11-13T21:44:27.627Z"
   }
  ]
 }

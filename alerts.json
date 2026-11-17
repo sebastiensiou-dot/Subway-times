@@ -1,5 +1,5 @@
 {
- "checked": "2026-11-17T11:43:01+00:00",
+ "checked": "2026-11-17T20:02:01+00:00",
  "alerts": [
   {
    "route": "1",
@@ -57,15 +57,6 @@
   },
   {
    "route": "1",
-   "text": "Line 1 Yonge-University: Subway trains will move slower than usual northbound from Bloor-Yonge to Rosedale stations while we work on track issues Thank you for your patience.",
-   "type": "Planned",
-   "severity": "Minor",
-   "updated": "2026-11-16T10:04:15.02Z",
-   "start": "2026-09-16T10:52:55Z",
-   "end": "0001-01-01T00:00:00Z"
-  },
-  {
-   "route": "1",
    "text": "Line 1 Yonge-University: Subway trains will move slower than usual northbound from Queen to TMU stations while we work on track issues",
    "type": "Planned",
    "severity": "Minor",
@@ -99,6 +90,15 @@
    "updated": "2026-11-15T20:19:56.583Z",
    "start": "2026-11-15T20:19:56.583Z",
    "end": "2026-11-18T23:00:00Z"
+  },
+  {
+   "route": "1",
+   "text": "Line 1 Yonge-University: There will be no subway service between Finch West and Wilson stations, starting 11:59 p.m., nightly Thursday, November 19 to Friday, November 20, due to planned track work. Shuttle buses will operate.",
+   "type": "Planned",
+   "severity": "Critical",
+   "updated": "2026-11-17T08:29:43.3Z",
+   "start": "2026-11-17T08:29:43.3Z",
+   "end": "2026-11-20T23:59:00Z"
   }
  ]
 }

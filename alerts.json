@@ -1,5 +1,5 @@
 {
- "checked": "2026-11-17T03:07:31+00:00",
+ "checked": "2026-11-17T11:43:01+00:00",
  "alerts": [
   {
    "route": "1",
@@ -99,15 +99,6 @@
    "updated": "2026-11-15T20:19:56.583Z",
    "start": "2026-11-15T20:19:56.583Z",
    "end": "2026-11-18T23:00:00Z"
-  },
-  {
-   "route": "5",
-   "text": "Line 5 Eglinton: Delays westbound at Cedarvale station due to a security incident Thank you for your patience.",
-   "type": "Planned",
-   "severity": "Critical",
-   "updated": "2026-11-16T22:06:35.647Z",
-   "start": "2026-11-16T22:06:35.647Z",
-   "end": "0001-01-01T00:00:00Z"
   }
  ]
 }

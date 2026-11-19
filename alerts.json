@@ -1,5 +1,5 @@
 {
- "checked": "2026-11-18T18:56:43+00:00",
+ "checked": "2026-11-19T00:56:24+00:00",
  "alerts": [
   {
    "route": "1",
@@ -81,6 +81,15 @@
    "updated": "2026-11-17T08:29:43.3Z",
    "start": "2026-11-17T08:29:43.3Z",
    "end": "2026-11-20T23:59:00Z"
+  },
+  {
+   "route": "5",
+   "text": "Line 5 Eglinton: No service between Sloane and Pharmacy stations due to an injury at track level at O'Connor station. Shuttle buses are running between Sloane and Pharmacy. Thank you for your patience.",
+   "type": "Planned",
+   "severity": "Critical",
+   "updated": "2026-11-18T18:28:52.407Z",
+   "start": "2026-11-18T18:14:04Z",
+   "end": "0001-01-01T00:00:00Z"
   }
  ]
 }

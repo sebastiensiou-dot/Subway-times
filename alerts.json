@@ -1,5 +1,5 @@
 {
- "checked": "2026-11-19T08:18:59+00:00",
+ "checked": "2026-11-19T17:26:37+00:00",
  "alerts": [
   {
    "route": "1",
@@ -63,24 +63,6 @@
    "updated": "2026-11-17T08:29:43.3Z",
    "start": "2026-11-17T08:29:43.3Z",
    "end": "2026-11-20T23:59:00Z"
-  },
-  {
-   "route": "1",
-   "text": "Line 1 Yonge-University: There is no subway service between York Mills and Eglinton stations due to structural maintenance. Shuttle buses are running.",
-   "type": "Planned",
-   "severity": "Critical",
-   "updated": "2026-11-18T23:00:02.347Z",
-   "start": "2026-11-18T23:00:00Z",
-   "end": "2026-11-19T03:30:00Z"
-  },
-  {
-   "route": "1",
-   "text": "Line 1 Yonge-University: There is limited subway service between Pioneer Village and Sheppard West stations for tunnel improvements Thank you for your patience.",
-   "type": "Planned",
-   "severity": "Major",
-   "updated": "2026-11-18T23:00:02.61Z",
-   "start": "2026-11-18T23:00:00Z",
-   "end": "2026-11-19T03:30:00Z"
   }
  ]
 }

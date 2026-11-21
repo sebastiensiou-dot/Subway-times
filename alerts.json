@@ -1,5 +1,5 @@
 {
- "checked": "2026-11-20T21:23:10+00:00",
+ "checked": "2026-11-21T02:38:19+00:00",
  "alerts": [
   {
    "route": "1",
@@ -63,6 +63,15 @@
    "updated": "2026-11-17T08:29:43.3Z",
    "start": "2026-11-17T08:29:43.3Z",
    "end": "2026-11-20T23:59:00Z"
+  },
+  {
+   "route": "5",
+   "text": "Line 5 Eglinton: Trains are not stopping at Caledonia station due to a security incident. Thank you for your patience.",
+   "type": "Planned",
+   "severity": "Critical",
+   "updated": "2026-11-20T21:36:41.08Z",
+   "start": "2026-11-20T21:36:41.08Z",
+   "end": "0001-01-01T00:00:00Z"
   }
  ]
 }

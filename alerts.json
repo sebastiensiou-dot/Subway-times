@@ -1,5 +1,5 @@
 {
- "checked": "2026-11-22T02:20:25+00:00",
+ "checked": "2026-11-22T09:59:41+00:00",
  "alerts": [
   {
    "route": "1",
@@ -54,24 +54,6 @@
    "updated": "2026-11-18T09:47:25.857Z",
    "start": "2026-10-28T09:57:49Z",
    "end": "0001-01-01T00:00:00Z"
-  },
-  {
-   "route": "5",
-   "text": "Line 5 Eglinton: Delays eastbound at Laird station due to an emergency alarm on board a train Thank you for your patience.",
-   "type": "Planned",
-   "severity": "Critical",
-   "updated": "2026-11-21T21:10:49.353Z",
-   "start": "2026-11-21T21:10:49.353Z",
-   "end": "0001-01-01T00:00:00Z"
-  },
-  {
-   "route": "5",
-   "text": "Line 5 Eglinton: Regular service has resumed between Laird and Sunnybrook Park stations.",
-   "type": "Planned",
-   "severity": "Regular",
-   "updated": "2026-11-21T21:18:57.847Z",
-   "start": "2026-11-21T21:18:57.847Z",
-   "end": "2026-11-21T21:33:57.847Z"
   }
  ]
 }

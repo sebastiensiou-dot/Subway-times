@@ -1,5 +1,5 @@
 {
- "checked": "2026-11-23T12:51:28+00:00",
+ "checked": "2026-11-24T00:29:49+00:00",
  "alerts": [
   {
    "route": "1",
@@ -72,6 +72,15 @@
    "updated": "2026-11-23T07:03:36.343Z",
    "start": "2026-11-23T07:03:36.343Z",
    "end": "2026-11-27T23:59:00Z"
+  },
+  {
+   "route": "1",
+   "text": "Line 1 Yonge-University: Regular service has resumed between St George and St Clair West stations.",
+   "type": "Planned",
+   "severity": "Regular",
+   "updated": "2026-11-23T19:20:57.463Z",
+   "start": "2026-11-23T19:20:57.463Z",
+   "end": "2026-11-23T19:35:57.463Z"
   }
  ]
 }

@@ -1,21 +1,21 @@
 {
- "checked": "2026-11-25T13:34:12+00:00",
+ "checked": "2026-11-25T22:42:19+00:00",
  "alerts": [
   {
    "route": "1",
    "text": "Line 1 Yonge-University: Subway trains will move slower than usual northbound from Wilson to Sheppard West stations while we work on track issues Thank you for your patience.",
    "type": "Planned",
    "severity": "Minor",
-   "updated": "2026-11-10T10:06:50.547Z",
+   "updated": "2026-11-25T09:52:07.997Z",
    "start": "2026-07-20T12:57:46Z",
    "end": "0001-01-01T00:00:00Z"
   },
   {
    "route": "1",
-   "text": "Line 1 Yonge-University: Subway trains will move slower than usual southbound from St Clair West to Dupont stations while we work on track issues",
+   "text": "Line 1 Yonge-University: Subway trains will move slower than usual southbound from St Clair West to Dupont stations while we work on track issues Thank you for your patience.",
    "type": "Planned",
    "severity": "Minor",
-   "updated": "2026-10-14T10:08:54.123Z",
+   "updated": "2026-11-25T09:51:58.517Z",
    "start": "2026-07-20T12:59:36Z",
    "end": "0001-01-01T00:00:00Z"
   },
@@ -42,7 +42,7 @@
    "text": "Line 1 Yonge-University: Subway trains will move slower than usual northbound from TMU to College stations while we work on track issues Thank you for your patience.",
    "type": "Planned",
    "severity": "Minor",
-   "updated": "2026-11-04T14:41:29.133Z",
+   "updated": "2026-11-25T09:51:33.097Z",
    "start": "2026-09-14T10:26:30Z",
    "end": "0001-01-01T00:00:00Z"
   },
@@ -51,7 +51,7 @@
    "text": "Line 1 Yonge-University: Subway trains will move slower than usual northbound from Queen to TMU stations while we work on track issues Thank you for your patience.",
    "type": "Planned",
    "severity": "Minor",
-   "updated": "2026-11-18T09:47:25.857Z",
+   "updated": "2026-11-25T09:51:45.09Z",
    "start": "2026-10-28T09:57:49Z",
    "end": "0001-01-01T00:00:00Z"
   },
@@ -72,6 +72,33 @@
    "updated": "2026-11-23T07:03:36.343Z",
    "start": "2026-11-23T07:03:36.343Z",
    "end": "2026-11-27T23:59:00Z"
+  },
+  {
+   "route": "1",
+   "text": "Line 1 Yonge-University: Subway trains will move slower than usual northbound from St Clair West to Cedarvale stations while we work on track issues Thank you for your patience.",
+   "type": "Planned",
+   "severity": "Minor",
+   "updated": "2026-11-25T09:52:56.483Z",
+   "start": "2026-11-25T09:52:56.483Z",
+   "end": "0001-01-01T00:00:00Z"
+  },
+  {
+   "route": "1",
+   "text": "Line 1 Yonge-University: Subway trains will move slower than usual southbound from Sheppard West to Wilson stations while we work on track issues Thank you for your patience.",
+   "type": "Planned",
+   "severity": "Minor",
+   "updated": "2026-11-25T09:53:52.1Z",
+   "start": "2026-11-25T09:53:52.1Z",
+   "end": "0001-01-01T00:00:00Z"
+  },
+  {
+   "route": "1",
+   "text": "Line 1 Yonge-University: Regular service has resumed southbound at St Clair station.",
+   "type": "Planned",
+   "severity": "Regular",
+   "updated": "2026-11-25T17:28:11.637Z",
+   "start": "2026-11-25T17:28:11.637Z",
+   "end": "2026-11-25T17:43:11.637Z"
   }
  ]
 }

@@ -1,5 +1,5 @@
 {
- "checked": "2026-11-26T14:09:48+00:00",
+ "checked": "2026-11-26T22:57:49+00:00",
  "alerts": [
   {
    "route": "1",
@@ -35,15 +35,6 @@
    "severity": "Minor",
    "updated": "2026-11-18T09:47:34.657Z",
    "start": "2026-08-20T10:23:02Z",
-   "end": "0001-01-01T00:00:00Z"
-  },
-  {
-   "route": "1",
-   "text": "Line 1 Yonge-University: Subway trains will move slower than usual northbound from TMU to College stations while we work on track issues Thank you for your patience.",
-   "type": "Planned",
-   "severity": "Minor",
-   "updated": "2026-11-25T09:51:33.097Z",
-   "start": "2026-09-14T10:26:30Z",
    "end": "0001-01-01T00:00:00Z"
   },
   {
@@ -87,8 +78,8 @@
    "text": "Line 1 Yonge-University: Subway trains will move slower than usual southbound from Sheppard West to Wilson stations while we work on track issues Thank you for your patience.",
    "type": "Planned",
    "severity": "Minor",
-   "updated": "2026-11-25T09:53:52.1Z",
-   "start": "2026-11-25T09:53:52.1Z",
+   "updated": "2026-11-26T10:10:06.39Z",
+   "start": "2026-11-25T09:53:52Z",
    "end": "0001-01-01T00:00:00Z"
   }
  ]

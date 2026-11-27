@@ -1,5 +1,5 @@
 {
- "checked": "2026-11-27T04:47:43+00:00",
+ "checked": "2026-11-27T14:26:10+00:00",
  "alerts": [
   {
    "route": "1",
@@ -48,15 +48,6 @@
   },
   {
    "route": "1",
-   "text": "Line 1 Yonge-University: There will be no subway service between Bloor-Yonge and Osgoode stations, starting 11:59 p.m., nightly Monday, November 23 to Thursday, November 26, due to planned track work. Shuttle buses will operate.",
-   "type": "Planned",
-   "severity": "Critical",
-   "updated": "2026-11-23T06:58:55.063Z",
-   "start": "2026-11-23T06:58:55.063Z",
-   "end": "2026-11-26T23:59:00Z"
-  },
-  {
-   "route": "1",
    "text": "Line 1 Yonge-University: There will be no subway service between College and Osgoode stations, starting 11:59 p.m., on Friday, November 27, due to planned track work. Shuttle buses will operate.",
    "type": "Planned",
    "severity": "Critical",
@@ -81,6 +72,15 @@
    "updated": "2026-11-26T10:10:06.39Z",
    "start": "2026-11-25T09:53:52Z",
    "end": "0001-01-01T00:00:00Z"
+  },
+  {
+   "route": "1",
+   "text": "Line 1 Yonge-University: Regular service has resumed between St Clair West and St Andrew stations.",
+   "type": "Planned",
+   "severity": "Regular",
+   "updated": "2026-11-27T09:24:10.69Z",
+   "start": "2026-11-27T09:24:10.69Z",
+   "end": "2026-11-27T09:39:10.69Z"
   }
  ]
 }

@@ -1,5 +1,5 @@
 {
- "checked": "2026-11-28T04:19:23+00:00",
+ "checked": "2026-11-28T13:15:01+00:00",
  "alerts": [
   {
    "route": "1",
@@ -45,15 +45,6 @@
    "updated": "2026-11-25T09:51:45.09Z",
    "start": "2026-10-28T09:57:49Z",
    "end": "0001-01-01T00:00:00Z"
-  },
-  {
-   "route": "1",
-   "text": "Line 1 Yonge-University: There will be no subway service between College and Osgoode stations, starting 11:59 p.m., on Friday, November 27, due to planned track work. Shuttle buses will operate.",
-   "type": "Planned",
-   "severity": "Critical",
-   "updated": "2026-11-23T07:03:36.343Z",
-   "start": "2026-11-23T07:03:36.343Z",
-   "end": "2026-11-27T23:59:00Z"
   },
   {
    "route": "1",
